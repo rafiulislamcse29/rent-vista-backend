@@ -36,7 +36,8 @@ ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = ['https://rent-vista.onrender.com','http://127.0.0.1:8000']
 
-LOGIN_URL="http://127.0.0.1:5500/login.html"
+# LOGIN_URL="http://127.0.0.1:5500/login.html"
+LOGIN_URL='https://rent-vista-client.vercel.app/login.html'
 
 # Application definition
 
