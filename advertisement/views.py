@@ -38,21 +38,6 @@ class RentAdvertisementViewSet(viewsets.ModelViewSet):
     else:  
       return queryset.filter(is_approved=True)
 
-   def approve_advertisement(self, request, pk=None):
-        if not request.user.is_staff:
-            return Response({"detail": "You do not have permission to perform this action."})
-
-        advertisement = self.get_object()
-        advertisement.is_approved = True
-        advertisement.save()
-        serializer = self.get_serializer(advertisement)
-        return Response(serializer.data)
-
-    @action(detail=True, methods=['put'])
-    def approve(self, request, pk=None):
-        return self.approve_advertisement(request, pk)
-      
-
 class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     requester_id=request.query_params.get('requester_id')
