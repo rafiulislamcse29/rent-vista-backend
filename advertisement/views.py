@@ -9,7 +9,7 @@ from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOfAdvertisement
 from rest_framework.exceptions import PermissionDenied
-
+from rest_framework import viewsets, permissions, status
 # Create your views here.
 
 class RentAdvertisementOwner(filters.BaseFilterBackend):
@@ -44,19 +44,15 @@ class RentAdvertisementViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
   def perform_update(self, serializer):
-     advertisement = self.get_object()
+      instance = self.get_object()
 
-     if self.request.user != 'admin':
-        raise PermissionDenied("You do not have permission to perform this action.")
+        # Check if the requesting user is an admin
+      if not self.request.user.is_staff:
+            raise permissions.PermissionDenied("You do not have permission to perform this action.")
 
-     is_approved = serializer.validated_data.get('is_approved', advertisement.is_approved)
-     advertisement.is_approved = is_approved
-
-     if advertisement.is_approved:
-        advertisement.is_approved=False
-     else:
-       advertisement.is_approved=True
-     advertisement.save()
+      is_approved = serializer.validated_data.get('is_approved', instance.is_approved)
+      instance.is_approved = is_approved
+      instance.save()
 
 class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
