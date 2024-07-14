@@ -3,6 +3,8 @@ from rest_framework import viewsets,filters
 from .models import RentAdvertisement,RentRequest,Favourite,Review
 from .serializers import RentAdvertisementSerializer,RentRequestSerializer,FavouriteSerializer,ReviewSerializer
 
+from rest_framework.response import Response
+
 from django.db.models import Q 
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOfAdvertisement
@@ -35,6 +37,21 @@ class RentAdvertisementViewSet(viewsets.ModelViewSet):
       return  queryset.filter(owner=owner_id)
     else:  
       return queryset.filter(is_approved=True)
+
+   def approve_advertisement(self, request, pk=None):
+        if not request.user.is_staff:
+            return Response({"detail": "You do not have permission to perform this action."})
+
+        advertisement = self.get_object()
+        advertisement.is_approved = True
+        advertisement.save()
+        serializer = self.get_serializer(advertisement)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['put'])
+    def approve(self, request, pk=None):
+        return self.approve_advertisement(request, pk)
+      
 
 class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
