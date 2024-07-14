@@ -17,7 +17,7 @@ class RentAdvertisement(models.Model):
   is_approved=models.BooleanField(default=False)
   request_accepted = models.BooleanField(default=False)
   created_at=models.DateTimeField(auto_now_add=True)
-  image=models.ImageField(upload_to='advertisement/images/')
+  image=models.ImageField(upload_to='advertisement/images/',null=True)
 
   def __str__(self) -> str:
     return self.title
