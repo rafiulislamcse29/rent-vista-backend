@@ -3,7 +3,7 @@ from rest_framework import viewsets,filters
 from .models import RentAdvertisement,RentRequest,Favourite,Review
 from .serializers import RentAdvertisementSerializer,RentRequestSerializer,FavouriteSerializer,ReviewSerializer
 
-
+from django.db.models import Q 
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOfAdvertisement
 from rest_framework.exceptions import PermissionDenied
@@ -13,8 +13,8 @@ from rest_framework.exceptions import PermissionDenied
 class RentAdvertisementOwner(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     owner_id=request.query_params.get('owner_id')
-    if owner_id:
-      return query_set.filter(owner=owner_id)
+    if owner_id :
+      print( query_set.filter(owner=owner_id ))
     return query_set
          
 
@@ -27,9 +27,13 @@ class RentAdvertisementViewSet(viewsets.ModelViewSet):
   def get_queryset(self):
     queryset = super().get_queryset()
     user = self.request.user
+    owner_id = self.request.query_params.get('owner_id')
+
     if user.is_staff:
       return queryset
-    else:
+    elif owner_id:
+      return  queryset.filter(owner=owner_id)
+    else:  
       return queryset.filter(is_approved=True)
 
 class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
