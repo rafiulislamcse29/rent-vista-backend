@@ -38,23 +38,12 @@ class RentAdvertisementViewSet(viewsets.ModelViewSet):
     else:  
       return queryset.filter(is_approved=True)
 
-class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
-   def filter_queryset(self,request,query_set,view):
-    requester_id=request.query_params.get('requester_id')
-    owner_id = request.query_params.get('owner_id')
-    if requester_id:
-      return query_set.filter(requester=requester_id)
-    elif owner_id:
-      return query_set.filter(advertisement__owner_id=owner_id)
-    return query_set
-
-    
-   def get_permissions(self):
+  def get_permissions(self):
         if self.action in ['update', 'partial_update']:
             return [IsAuthenticated(), IsOwnerOfAdvertisement()]
         return [IsAuthenticated()]
 
-   def perform_update(self, serializer):
+  def perform_update(self, serializer):
      advertisement = self.get_object()
 
      if self.request.user != 'admin':
@@ -68,6 +57,18 @@ class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
      else:
        advertisement.is_approved=True
      advertisement.save()
+
+class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
+   def filter_queryset(self,request,query_set,view):
+    requester_id=request.query_params.get('requester_id')
+    owner_id = request.query_params.get('owner_id')
+    if requester_id:
+      return query_set.filter(requester=requester_id)
+    elif owner_id:
+      return query_set.filter(advertisement__owner_id=owner_id)
+    return query_set
+
+    
    
 class RentRequestViewSet(viewsets.ModelViewSet):
    
