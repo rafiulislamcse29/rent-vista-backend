@@ -49,25 +49,25 @@ class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
     return query_set
 
     
-  def get_permissions(self):
+   def get_permissions(self):
         if self.action in ['update', 'partial_update']:
             return [IsAuthenticated(), IsOwnerOfAdvertisement()]
         return [IsAuthenticated()]
 
-  def perform_update(self, serializer):
-    advertisement = self.get_object()
+   def perform_update(self, serializer):
+     advertisement = self.get_object()
 
-    if self.request.user != 'admin':
+     if self.request.user != 'admin':
         raise PermissionDenied("You do not have permission to perform this action.")
 
-    is_approved = serializer.validated_data.get('is_approved', advertisement.is_approved)
-    advertisement.is_approved = is_approved
+     is_approved = serializer.validated_data.get('is_approved', advertisement.is_approved)
+     advertisement.is_approved = is_approved
 
-    if advertisement.is_approved:
+     if advertisement.is_approved:
         advertisement.is_approved=False
-    else:
+     else:
        advertisement.is_approved=True
-    advertisement.save()
+     advertisement.save()
    
 class RentRequestViewSet(viewsets.ModelViewSet):
    
