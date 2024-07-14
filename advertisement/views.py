@@ -39,17 +39,6 @@ class RentAdvertisementViewSet(viewsets.ModelViewSet):
       return queryset.filter(is_approved=True)
 
 
-  def perform_update(self, serializer):
-      instance = self.get_object()
-
-        # Check if the requesting user is an admin
-      if not self.request.user.is_staff:
-            raise permissions.PermissionDenied("You do not have permission to perform this action.")
-
-      is_approved = serializer.validated_data.get('is_approved', instance.is_approved)
-      instance.is_approved = is_approved
-      instance.save()
-
 class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     requester_id=request.query_params.get('requester_id')
