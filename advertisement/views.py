@@ -16,7 +16,7 @@ class RentAdvertisementOwner(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     owner_id=request.query_params.get('owner_id')
     if owner_id :
-      print( query_set.filter(owner=owner_id ))
+      return query_set.filter(owner=owner_id )
     return query_set
          
 
@@ -31,10 +31,10 @@ class RentAdvertisementViewSet(viewsets.ModelViewSet):
     user = self.request.user
     owner_id = self.request.query_params.get('owner_id')
 
-    if user.is_staff:
-      return queryset
-    elif owner_id:
-      return  queryset.filter(owner=owner_id)
+    if owner_id:
+      return queryset.filter(owner=owner_id)
+    elif user.is_staff:
+      return  queryset
     else:  
       return queryset.filter(is_approved=True)
 
