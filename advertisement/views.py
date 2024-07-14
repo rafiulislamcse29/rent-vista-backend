@@ -39,9 +39,12 @@ class RentAdvertisementViewSet(viewsets.ModelViewSet):
       return queryset.filter(is_approved=True)
 
   def get_permissions(self):
-        if self.action in ['update', 'partial_update']:
-            return [IsAuthenticated(), IsOwnerOfAdvertisement()]
-        return [IsAuthenticated()]
+       if self.action in ['update', 'partial_update']:
+            if self.request.user.is_authenticated:
+                return [permissions.IsAuthenticated(), IsOwnerOfAdvertisement()]
+            else:
+                return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]  # 
 
   def perform_update(self, serializer):
       instance = self.get_object()
