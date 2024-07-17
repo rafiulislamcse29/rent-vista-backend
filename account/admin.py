@@ -9,9 +9,12 @@ class UserAdmin(admin.ModelAdmin):
         if obj.role == 'admin':
             obj.is_superuser = True
             obj.is_staff = True
+            obj.role == 'admin'
         else:
             obj.is_superuser = False
             obj.is_staff = False
+            obj.role == 'user'
         obj.save()
+      
 
 admin.site.register(User,UserAdmin)
