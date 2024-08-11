@@ -54,6 +54,6 @@ class Review(models.Model):
   comment=models.TextField()
   rating=models.CharField(choices=STAR_CHOICES,max_length=20)
   created_at=models.DateTimeField(auto_now_add=True)
-
+  
   def __str__(self) -> str:
     return self.advertisement.title

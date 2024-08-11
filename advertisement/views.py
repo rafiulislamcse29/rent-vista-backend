@@ -82,7 +82,7 @@ class RentRequestSpecificAdvertisement(filters.BaseFilterBackend):
     requester_id=request.query_params.get('requester_id')
     owner_id = request.query_params.get('owner_id')
     advertisement_id=request.query_params.get('advertisement_id')
-
+    
     if requester_id:
       return query_set.filter(requester=requester_id)
     elif owner_id:
@@ -152,3 +152,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
   queryset=Review.objects.all()
   serializer_class=ReviewSerializer
   filter_backends=[ReviewForSpecificAdvertisement]
+
+  def perform_create(self,serializer):
+    advertisement_id = serializer.validated_data['advertisement'].id
+    user = self.request.user
+    print(advertisement_id,user)
+
+    if not RentRequest.objects.filter(advertisement_id=advertisement_id, requester=user, is_accepted=True).exists():
+       raise PermissionDenied("You must have send rent request  an accepted rent request for this advertisement before you can leave a review.")
+    serializer.save(reviewer=user)
