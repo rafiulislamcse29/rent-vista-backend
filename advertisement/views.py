@@ -161,6 +161,18 @@ class RentRequestViewSet(viewsets.ModelViewSet):
     rent_request.save()
     advertisement.save()
 
+  def destroy(self, request, *args, **kwargs):
+    rent_request = self.get_object()
+    advertisement = rent_request.advertisement
+    
+    response = super().destroy(request, *args, **kwargs)
+        
+    if advertisement.request_accepted:
+      advertisement.request_accepted = False
+      advertisement.save()
+
+    return response
+
 
 class FavouriteSpecificAdvertisement(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
