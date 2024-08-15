@@ -39,7 +39,7 @@ class UserRegistrationView(APIView):
              # Create UserBankAccount with account number as 
             account_no = user.id + 10000
             UserBankAccount.objects.create(user=user, account_no=account_no)
-            return Response("Check your mail confirmation")
+            return Response(f'Check your mail confirmation your account number {account_no}')
         return Response(serializer.errors)
 
 def activate(request, uid64, token):
