@@ -21,18 +21,18 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from rest_framework.routers import DefaultRouter
-from . views import UserViewSet
+from . views import UserViewSet,UserBankAccountViewSet
 router = DefaultRouter()
+
 router.register('users', UserViewSet)
-
-
+router.register('user-bank-accounts', UserBankAccountViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('api/auth/',include('account.urls')),
     path('category/',include('category.urls')),
-    path('advertisement/',include('advertisement.urls'))
+    path('advertisement/',include('advertisement.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

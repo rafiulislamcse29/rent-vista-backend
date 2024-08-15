@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.views import APIView
-from account.models import User
+from account.models import User,UserBankAccount
 from .serializers import UserSerializer,UserLoginSerializer
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -36,6 +36,9 @@ class UserRegistrationView(APIView):
             email = EmailMultiAlternatives(email_subject , '', to=[user.email])
             email.attach_alternative(email_body, "text/html")
             email.send()
+             # Create UserBankAccount with account number as 
+            account_no = user.id + 10000
+            UserBankAccount.objects.create(user=user, account_no=account_no)
             return Response("Check your mail confirmation")
         return Response(serializer.errors)
 

@@ -31,7 +31,7 @@ class RentRequest(models.Model):
   def __str__(self) -> str:
     return self.advertisement.title
   
-
+  
 class Favourite(models.Model):
   user=models.ForeignKey(User,related_name='favorites',on_delete=models.CASCADE)
   advertisement=models.ForeignKey(RentAdvertisement,related_name='favourites',on_delete=models.CASCADE)
@@ -57,3 +57,4 @@ class Review(models.Model):
   
   def __str__(self) -> str:
     return self.advertisement.title
+    

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User,UserBankAccount
 
 class UserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(required = True) 
@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
       password = self.validated_data['password']
       password2 = self.validated_data['confirm_password']
       role = self.validated_data['role']
-
+      
       if password != password2:
         raise serializers.ValidationError({'error' : "Password Doesn't Mactched"})
       
@@ -26,8 +26,12 @@ class UserSerializer(serializers.ModelSerializer):
       account.set_password(password)
       account.is_active=False
       account.save()
-      print(account)
       return account
+
+class UserBankAccountSerializer(serializers.ModelSerializer):
+   class Meta:
+    model=UserBankAccount
+    fields='__all__'
 
 
 class UserLoginSerializer(serializers.Serializer):

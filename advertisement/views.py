@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from rest_framework import viewsets,filters,status
 from .models import RentAdvertisement,RentRequest,Favourite,Review
+from account.models import UserBankAccount
 from .serializers import RentAdvertisementSerializer,RentRequestSerializer,FavouriteSerializer,ReviewSerializer
 
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, PermissionDenied
-
+from django.core.exceptions import ValidationError
 from django.db.models import Q 
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOfAdvertisement
@@ -105,6 +106,41 @@ class RentRequestViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated(), IsOwnerOfAdvertisement()]
         return [IsAuthenticated()]
 
+  def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Check if the user has a bank account and sufficient balance
+        advertisement = serializer.validated_data.get('advertisement')
+        user_account = UserBankAccount.objects.filter(user_id=request.user.id).first()
+
+        if user_account is None:
+            return Response({"error": "User does not have a bank account."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if user_account.balance < advertisement.price:
+            return Response({"error": "Insufficient balance to make this rent request."}, status=status.HTTP_400_BAD_REQUEST)
+
+      
+        self.perform_create(serializer)
+        
+       
+        user_account.balance -= advertisement.price
+        user_account.save()
+
+        advertisement.request_accepted = True
+        advertisement.save()
+
+        rent_request = serializer.instance
+        rent_request.is_accepted = True
+        rent_request.save()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+  def perform_create(self, serializer):
+        serializer.save(requester=self.request.user)
+        
+
   def perform_update(self, serializer):
     rent_request = self.get_object()
     advertisement = rent_request.advertisement
@@ -156,7 +192,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
   def perform_create(self,serializer):
     advertisement_id = serializer.validated_data['advertisement'].id
     user = self.request.user
-    print(advertisement_id,user)
 
     if not RentRequest.objects.filter(advertisement_id=advertisement_id, requester=user, is_accepted=True).exists():
        raise PermissionDenied("You must have send rent request  an accepted rent request for this advertisement before you can leave a review.")
