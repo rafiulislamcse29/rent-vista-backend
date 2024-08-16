@@ -21,11 +21,15 @@ class UserBankAccountViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def deposit(self, request):
-        account_no = request.data.get('account_no')
+        # account_no = request.data.get('account_no')
+        user_id = self.request.query_params.get('user_id')
         balance = request.data.get('balance')
        
-        if account_no is None:
-            return Response({"error": "Account number incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+        # if account_no is None:
+        #     return Response({"error": "Account number incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+        if user_id is None:
+            return Response({"error": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
 
         if balance is None:
             return Response({"error": "balance is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -40,9 +44,9 @@ class UserBankAccountViewSet(viewsets.ModelViewSet):
 
        
         try:
-            account = UserBankAccount.objects.get(account_no=account_no)
+            account = UserBankAccount.objects.get(user_id=user_id)
         except UserBankAccount.DoesNotExist:
-            return Response({"error": "User Bank Account do not exist"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "User Bank Account does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
        
         account.balance += balance
